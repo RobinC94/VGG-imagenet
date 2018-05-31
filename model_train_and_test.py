@@ -59,8 +59,8 @@ def fine_tune_model(model, epochs = nb_epoch, batch_size = batch_size):
     lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1), cooldown=0, patience=5, min_lr=0.5e-6)
     lr_scheduler = LearningRateScheduler(lr_fine_tune_schedule)
     early_stopper = EarlyStopping(min_delta=0.001, patience=10)
-    csv_logger = CSVLogger('./result/fine_tune_vgg19_imagenet.csv')
-    ckpt = ModelCheckpoint(filepath="./weights/vgg19_fine_tune_weights.{epoch:02d}.h5", monitor='loss', save_best_only=True,
+    csv_logger = CSVLogger('./result/fine_tune_vgg19_imagenet.4096.csv')
+    ckpt = ModelCheckpoint(filepath="./weights/vgg19_fine_tune_weights.4096.{epoch:02d}.h5", monitor='loss', save_best_only=True,
                            save_weights_only=True)
     tensorboard = TensorBoard(log_dir='./logs', histogram_freq=1, write_images=True)
     model.fit_generator(generator=training_data_gen(),
@@ -136,14 +136,14 @@ def generate_digit_indice_dict():
 
 
 def lr_fine_tune_schedule(epoch):
-    lr = 1e-3
-    if epoch >= 8:
+    lr = 1e-4
+    if epoch >= 6:
         lr *= sqrt(0.1)
-    if epoch >= 5:
+    if epoch >= 4:
         lr *= sqrt(0.1)
-    if epoch >= 3:
+    if epoch >= 2:
         lr *= sqrt(0.1)
-    if epoch >= 1:
+    if epoch >= 0:
         lr *= sqrt(0.1)
     print('Learning rate: ', lr)
     return lr

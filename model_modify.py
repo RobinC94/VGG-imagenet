@@ -11,6 +11,7 @@ from array import array
 
 from Bio import Cluster
 
+from vgg19_modified import VGG19_Modified
 
 ####################################
 ##config params
@@ -47,23 +48,21 @@ def modify_model(model, cluster_id, temp_kernels):
     coef_a, coef_b = get_coefficients(kernels_array, cluster_id, temp_kernels)
 
     # 4 build modified model
-    # model_new = ResNet50_Modified(include_top=True,
-    #                               template=temp_kernels,
-    #                               clusterid=cluster_id)
-    # print 'rebuilding model done'
-    #
-    # # 5 set new model weights
-    # set_cluster_weights_to_model(model, model_new,
-    #                              coef_a=coef_a,
-    #                              coef_b=coef_b,
-    #                              clusterid=cluster_id,
-    #                              cdata=temp_kernels,
-    #                              conv_layers_list=conv_layers_list)
+    model_new = VGG19_Modified(include_top=True)
+    print 'rebuilding model done'
+
+    # 5 set new model weights
+    set_cluster_weights_to_model(model, model_new,
+                                 coef_a=coef_a,
+                                 coef_b=coef_b,
+                                 clusterid=cluster_id,
+                                 cdata=temp_kernels,
+                                 conv_layers_list=conv_layers_list)
 
 
     set_cluster_weights_to_old_model(model, cluster_id,temp_kernels,coef_a,coef_b,conv_layers_list)
 
-    #return model_new
+    return model_new
 
 def save_cluster_result(clusterid, temp, f):
     f_clusterid = f + "_clusterid.npy"
@@ -187,6 +186,7 @@ def set_cluster_weights_to_model(model, model_new, clusterid, cdata, coef_a, coe
         model_new.layers[l].set_weights(weights_new)
 
     weighted_layers_list = get_weighted_layers_list(model)
+    cprint("weighted conv layers is:" + str(weighted_layers_list), "red")
     for l in weighted_layers_list:
         weights = model.layers[l].get_weights()
         model_new.layers[l].set_weights(weights)
@@ -204,10 +204,6 @@ def set_cluster_weights_to_old_model(model, clusterid, cdata, coef_a, coef_b, co
                 weights[0][:, :, s, i] = np.array(a*temp+b).reshape(filter_size, filter_size)
                 kernels_id += 1
         model.layers[l].set_weights(weights)
-
-
-
-
 
 
 #####################################

@@ -108,6 +108,8 @@ class ModifiedConv2D(Layer):
                 data_format=self.data_format
             )
 
+        if self.activation is not None:
+            return self.activation(outputs)
         return outputs
 
     def compute_output_shape(self, input_shape):
